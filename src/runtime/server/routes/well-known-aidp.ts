@@ -6,7 +6,7 @@
 //   import { aidpEntityRoute } from '@speakspec/next'
 //   export const GET = aidpEntityRoute()
 //
-// Workflow on each request mirrors @speakspec/nuxt:
+// Workflow on each request (per AIDP transport spec §8.5–8.13):
 //   1. Read cached payload + ETag from the cache store.
 //   2. If fresh, respond with cached + ETag + Cache-Control. If
 //      inbound If-None-Match matches, short-circuit to 304.

@@ -137,17 +137,15 @@ works.
 
 ## Caveats vs `@speakspec/nuxt`
 
-- **Edge runtime**: middleware runs in Edge by default. The bot-detect
-  middleware is Edge-safe (no Node-specific APIs); the impression
-  upload queue uses `fetch` and `console.log` only — also Edge-safe.
-  However, the webhook receiver uses `node:crypto` HMAC verification
-  and **must** run in the Node runtime. Set `export const runtime = 'nodejs'`
-  in `app/api/_aidp/invalidate/route.ts`:
+- **Edge runtime**: the bot-detect middleware is Edge-safe (no
+  Node-specific APIs); the impression upload queue uses `fetch` and
+  `console.log` only — also Edge-safe. However, the webhook receiver
+  uses `node:crypto` HMAC verification and **must** run in the Node
+  runtime. Pin it explicitly in `app/api/_aidp/invalidate/route.ts`:
   ```ts
+  import { aidpWebhookRoute } from '@speakspec/next'
   export const runtime = 'nodejs'
-  export { POST } from '...'  // not valid; assign instead:
-  // const _POST = aidpWebhookRoute()
-  // export const POST = _POST
+  export const POST = aidpWebhookRoute()
   ```
 - **Multi-instance**: in-memory cache + impression queue are
   per-process. Vercel cold starts may drop in-flight impressions.
