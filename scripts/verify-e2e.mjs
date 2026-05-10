@@ -58,8 +58,8 @@ function startUpstream() {
     const server = createServer((req, res) => {
       upstreamHits.push({ method: req.method, url: req.url, auth: req.headers.authorization })
       const url = new URL(req.url, `http://localhost`)
-      let body = null
-      let etag = '"v1"'
+      let body
+      const etag = '"v1"'
 
       if (url.pathname === `/public/entity/${ENTITY_ID}`) {
         if (req.headers['if-none-match'] === etag) {

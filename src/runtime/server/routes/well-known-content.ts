@@ -17,14 +17,10 @@ import {
   isFresh,
   isUpstream4xx,
   respondWithCache,
-  DEFAULT_CACHE_TTL_MS,
   type CachedBundle,
 } from '../utils/cache'
 import { getCacheStore } from '../cache-store'
-import { readConfig } from '../../config'
-
-const FRESH_CACHE_CONTROL = 'public, max-age=60, stale-while-revalidate=300'
-const STALE_CACHE_CONTROL = 'public, max-age=10, stale-while-revalidate=60'
+import { readConfig, buildCacheControl } from '../../config'
 
 export function aidpContentRoute() {
   return async function GET(
@@ -35,6 +31,9 @@ export function aidpContentRoute() {
     if (!config.entityId) {
       return errorResponse(503, 'AIDP module not configured: missing entityId')
     }
+    const FRESH_CACHE_CONTROL = buildCacheControl(config.cache.contentMaxAge, config.cache.contentSwr)
+    const STALE_CACHE_CONTROL = buildCacheControl(10, 60)
+    const ttlMs = config.cache.ttlSec * 1000
 
     const { id: rawId } = await context.params
     const contentId = rawId.endsWith('.json') ? rawId.slice(0, -5) : rawId
@@ -78,7 +77,7 @@ export function aidpContentRoute() {
       const refreshed: CachedBundle<Record<string, unknown>> = {
         payload: cached.payload,
         etag: cached.etag,
-        expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS,
+        expiresAt: Date.now() + ttlMs,
       }
       await store.setItem(key, refreshed)
       return respondWithCache(refreshed.etag, refreshed.payload, FRESH_CACHE_CONTROL, inboundIfNoneMatch)
@@ -91,7 +90,7 @@ export function aidpContentRoute() {
     const fresh: CachedBundle<Record<string, unknown>> = {
       payload: result.payload,
       etag: result.etag,
-      expiresAt: Date.now() + DEFAULT_CACHE_TTL_MS,
+      expiresAt: Date.now() + ttlMs,
     }
     await store.setItem(key, fresh)
     return respondWithCache(fresh.etag, fresh.payload, FRESH_CACHE_CONTROL, inboundIfNoneMatch)
