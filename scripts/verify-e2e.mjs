@@ -168,7 +168,8 @@ async function main() {
 
     check('returns Response', res instanceof Response)
     check('status 200', res.status === 200, `got ${res.status}`)
-    check('content-type is JSON', (res.headers.get('content-type') ?? '').includes('application/json'))
+    check('content-type is application/aidp+json', (res.headers.get('content-type') ?? '') === 'application/aidp+json')
+    check('access-control-allow-origin is *', res.headers.get('access-control-allow-origin') === '*')
     check('etag header present', !!res.headers.get('etag'), res.headers.get('etag') ?? '(none)')
     check('cache-control present', !!res.headers.get('cache-control'))
 
