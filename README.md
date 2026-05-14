@@ -53,6 +53,12 @@ import { aidpWebhookRoute } from '@speakspec/next'
 export const POST = aidpWebhookRoute()
 ```
 
+```ts
+// app/llms.txt/route.ts  (optional — serves spec §11.3 llms.txt projection)
+import { llmsTxtRoute } from '@speakspec/next'
+export const GET = llmsTxtRoute()
+```
+
 ## Content inline vs directory (v0.4+)
 
 AIDP v0.4 introduces per-type content strategy. The entity owner can decide, per content type, whether content appears:
